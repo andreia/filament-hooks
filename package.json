@@ -1,0 +1,16 @@
+{
+  "name": "filament-hooks",
+  "version": "1.0.0",
+  "description": "Interactive visual reference for all Filament PHP lifecycle hooks.",
+  "homepage": "https://github.com/andreia/filament-hooks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreia/filament-hooks.git"
+  },
+  "scripts": {
+    "dev": "npx serve . --listen 3000",
+    "update-alpine": "curl -fsSL https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js -o assets/vendor/alpine.min.js && echo 'Alpine updated'"
+  },
+  "devDependencies": {
+  }
+}

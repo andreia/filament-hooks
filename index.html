@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Filament PHP Hooks — Interactive Visual Guide to Lifecycle Hooks</title>
+    <meta name="description" content="Interactive visual reference for all Filament PHP lifecycle hooks — field hooks, create/edit page hooks, action hooks and table column hooks. Click any lightbulb to explore hook details, when to use them, and code examples.">
+    <meta name="keywords" content="Filament PHP, Filament hooks, lifecycle hooks, afterStateHydrated, beforeCreate, afterSave, FilamentPHP, Laravel Filament, PHP admin panel">
+    <meta name="author" content="Andréia Bohner">
+    <link rel="canonical" href="https://github.com/andreia/filament-hooks">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://github.com/andreia/filament-hooks">
+    <meta property="og:title" content="Filament PHP Hooks — Interactive Visual Guide">
+    <meta property="og:description" content="Explore all Filament PHP lifecycle hooks interactively. Click a lightbulb to see hook details, usage tips, and code examples.">
+    <meta property="og:image" content="https://github.com/andreia/filament-hooks/og-image.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Filament PHP Hooks — Interactive Visual Guide">
+    <meta name="twitter:description" content="Explore all Filament PHP lifecycle hooks interactively. Click a lightbulb to see hook details, usage tips, and code examples.">
+    <meta name="twitter:image" content="https://github.com/andreia/filament-hooks/og-image.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Filament PHP Hooks — Interactive Visual Guide to Lifecycle Hooks",
+      "description": "Interactive visual reference for all Filament PHP lifecycle hooks including field hooks, create/edit page hooks, action hooks and table column hooks.",
+      "author": { "@type": "Person", "name": "Andréia Bohner", "url": "https://github.com/andreia" },
+      "publisher": { "@type": "Person", "name": "Andréia Bohner" },
+      "about": { "@type": "SoftwareApplication", "name": "Filament PHP", "url": "https://filamentphp.com" }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Mono:wght@300;400;500;600&family=Google+Sans:wght@300;400;500&family=Playwrite+US+Trad:wght@100..400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script type="module" src="assets/js/highlight.js"></script>
+
+    <script defer src="assets/vendor/alpine.min.js"></script>
+</head>
+<body x-data="hooksApp()" :class="selectedHook ? 'hook-open' : ''">
+
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="header-left">
+                <div class="brand">
+                    <div class="brand-title">filament</div>
+                    <div class="brand-sub">lifecycle hook reference</div>
+                </div>
+
+                <!-- Desktop nav -->
+                <nav class="desk-nav">
+                    <template x-for="group in hookGroups" :key="group.id">
+                        <button
+                            @click="selectedGroup = group.id; selectedHook = null"
+                            :class="selectedGroup === group.id ? 'nav-btn active' : 'nav-btn'"
+                            x-text="group.label">
+                        </button>
+                    </template>
+                </nav>
+            </div>
+
+            <div class="header-right">
+                <!-- Hamburger -->
+                <button class="hamburger" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menu">
+                    <span class="ham-line"
+                          :style="mobileMenuOpen ? 'transform:rotate(45deg) translate(4.5px,4.5px)' : ''"></span>
+                    <span class="ham-line"
+                          :style="mobileMenuOpen ? 'opacity:0' : ''"></span>
+                    <span class="ham-line"
+                          :style="mobileMenuOpen ? 'transform:rotate(-45deg) translate(4.5px,-4.5px)' : ''"></span>
+                </button>
+
+                <a href="https://github.com/andreia/filament-hooks" target="_blank" class="gh-link" aria-label="GitHub">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile dropdown -->
+        <div x-show="mobileMenuOpen"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-1"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             style="max-width:1280px; margin:0 auto; padding: 0 1.75rem 0.75rem;">
+            <nav class="mobile-nav">
+                <template x-for="group in hookGroups" :key="group.id">
+                    <button
+                        @click="selectedGroup = group.id; selectedHook = null; mobileMenuOpen = false"
+                        :class="selectedGroup === group.id ? 'mobile-nav-btn active' : 'mobile-nav-btn'"
+                        x-text="group.label">
+                    </button>
+                </template>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-wrap">
+
+        <!-- Bulbs -->
+        <div style="overflow:visible; margin-bottom:1.25rem;">
+            <div id="bulbs-container" style="overflow:visible;"></div>
+        </div>
+
+        <!-- Hook detail card -->
+        <div x-show="selectedHook"
+             x-transition:enter="transition ease-out duration-250"
+             x-transition:enter-start="opacity-0 translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
+            <template x-if="selectedHookData">
+                <div class="hook-card">
+                    <button class="close-btn" @click="selectedHook = null" aria-label="Close">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <!-- Multi-method hook (e.g. mutateData) -->
+                    <template x-if="selectedHookData.methods">
+                        <div>
+                            <template x-for="(method, idx) in selectedHookData.methods" :key="method.name">
+                                <div :style="idx > 0 ? 'margin-top:2.5rem; padding-top:2rem; border-top:1px solid var(--border)' : 'padding-right:2rem'">
+                                    <div class="r1" style="margin-bottom:1.75rem;">
+                                        <div class="hook-fn-name" x-text="method.name + '()'"></div>
+                                        <div class="hook-desc" x-text="method.description"></div>
+                                        <template x-if="method.worksOn">
+                                            <div class="works-on-row">
+                                                <span class="works-on-label">Works on</span>
+                                                <template x-for="action in method.worksOn.split(', ')" :key="action">
+                                                    <span class="works-on-pill" x-text="action"></span>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="r2" style="margin-bottom:1.5rem;">
+                                        <div class="section-label">When to use</div>
+                                        <p class="when-text" x-text="method.when"></p>
+                                    </div>
+                                    <div class="r3">
+                                        <div class="section-label">Example</div>
+                                        <div class="code-panel">
+                                            <div class="code-chrome">
+                                                <span class="dot dot-r"></span>
+                                                <span class="dot dot-y"></span>
+                                                <span class="dot dot-g"></span>
+                                            </div>
+                                            <div class="shiki-wrap"
+                                                 x-html="(highlightedHtmls && highlightedHtmls[idx]) || '<div class=\'code-loading\'>highlighting…</div>'">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Single hook (standard) -->
+                    <template x-if="!selectedHookData.methods">
+                        <div>
+                            <div class="r1" style="margin-bottom:1.75rem; padding-right:2rem;">
+                                <div class="hook-fn-name" x-text="selectedHookData.name + '()'"></div>
+                                <div class="hook-desc" x-text="selectedHookData.description"></div>
+                                <template x-if="selectedHookData.worksOn">
+                                    <div class="works-on-row">
+                                        <span class="works-on-label">Works on</span>
+                                        <template x-for="action in selectedHookData.worksOn.split(', ')" :key="action">
+                                            <span class="works-on-pill" x-text="action"></span>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="r2" style="margin-bottom:1.5rem;">
+                                <div class="section-label">When to use</div>
+                                <p class="when-text" x-text="selectedHookData.when"></p>
+                            </div>
+                            <div class="r3">
+                                <div class="section-label">Example</div>
+                                <div class="code-panel">
+                                    <div class="code-chrome">
+                                        <span class="dot dot-r"></span>
+                                        <span class="dot dot-y"></span>
+                                        <span class="dot dot-g"></span>
+                                    </div>
+                                    <div class="shiki-wrap"
+                                         x-html="highlightedHtml || '<div class=\'code-loading\'>highlighting…</div>'">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Note block -->
+                            <template x-if="selectedHookData.note">
+                                <div class="note-block">
+                                    <div class="note-label">Note</div>
+                                    <p class="note-text" x-text="selectedHookData.note"></p>
+                                    <div class="code-panel">
+                                        <div class="code-chrome">
+                                            <span class="dot dot-r"></span>
+                                            <span class="dot dot-y"></span>
+                                            <span class="dot dot-g"></span>
+                                        </div>
+                                        <div class="shiki-wrap"
+                                             x-html="highlightedNoteHtml || '<div class=\'code-loading\'>highlighting…</div>'">
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+
+        <!-- Placeholder -->
+        <div x-show="!selectedHook" class="placeholder">
+            <svg width="34" height="34" fill="none" stroke="var(--text-dim)" stroke-width="1.4" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+            <p>select a lightbulb to explore the hook</p>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        made with
+        <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg"
+             style="display:inline-block; vertical-align:middle; margin: 0 2px -1px;" aria-label="love">
+            <defs>
+                <radialGradient id="heart-glow" cx="50%" cy="45%" r="55%">
+                    <stop offset="0%"   stop-color="#fef08a" stop-opacity="1"/>
+                    <stop offset="40%"  stop-color="#f59e0b" stop-opacity="0.95"/>
+                    <stop offset="100%" stop-color="#b45309" stop-opacity="0.7"/>
+                </radialGradient>
+                <filter id="heart-blur" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="1.4" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+            </defs>
+            <ellipse cx="9" cy="8.5" rx="7.5" ry="6.5" fill="#f59e0b" opacity="0.18"/>
+            <path d="M9 14 C9 14, 1.5 9.2, 1.5 5.5 C1.5 3.0, 3.2 1.5, 5.25 1.5 C6.8 1.5, 8.1 2.5, 9 3.6 C9.9 2.5, 11.2 1.5, 12.75 1.5 C14.8 1.5, 16.5 3.0, 16.5 5.5 C16.5 9.2, 9 14, 9 14 Z"
+                  fill="url(#heart-glow)" filter="url(#heart-blur)" opacity="0.95"/>
+        </svg>
+        by <a href="https://github.com/andreia" target="_blank" rel="noopener">Andréia Bohner</a>
+        for the Filament community &nbsp;·&nbsp;
+        explore the full docs at <a href="https://filamentphp.com" target="_blank" rel="noopener">filamentphp.com</a>
+    </footer>
+
+    <script src="assets/js/hooks-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/fireflies.js"></script>
+
+</body>
+</html>
