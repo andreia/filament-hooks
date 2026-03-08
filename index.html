@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K9GSFQZ771"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-K9GSFQZ771');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -92,7 +101,8 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100"
              x-transition:leave-end="opacity-0"
-             style="max-width:1280px; margin:0 auto; padding: 0 1.75rem 0.75rem;">
+             class="mobile-nav-dropdown"
+             style="padding: 0 1.75rem 0.75rem;">
             <nav class="mobile-nav">
                 <template x-for="group in hookGroups" :key="group.id">
                     <button
@@ -113,7 +123,8 @@
         </div>
 
         <!-- Hook detail card -->
-        <div x-show="selectedHook"
+        <div class="hook-card-wrap"
+             x-show="selectedHook"
              x-transition:enter="transition ease-out duration-250"
              x-transition:enter-start="opacity-0 translate-y-2"
              x-transition:enter-end="opacity-100 translate-y-0"

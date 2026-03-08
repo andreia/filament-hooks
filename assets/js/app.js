@@ -38,6 +38,18 @@ function hooksApp() {
             const container = document.getElementById('bulbs-container');
             if (!container) return;
             const hooks = this.currentGroup.hooks;
+            const w = window.innerWidth;
+
+            if (w < 520) {
+                this._renderBulbsMobile(container, hooks);
+            } else if (w < 1025) {
+                this._renderBulbsTablet(container, hooks);
+            } else {
+                this._renderBulbsDesktop(container, hooks);
+            }
+        },
+
+        _renderBulbsDesktop(container, hooks) {
             const n = hooks.length;
 
             const viewW    = 1200;
@@ -66,14 +78,132 @@ function hooksApp() {
                   <circle fill="#162030" stroke="#2a3a52" stroke-width="1" cx="${x}" cy="${wireY + 1}" r="2.8"/>`;
             }).join('');
 
+            container.style.overflowX = '';
+            container.innerHTML = `
+            <svg width="100%" viewBox="0 0 ${viewW} ${viewH}"
+                 preserveAspectRatio="xMidYMid meet"
+                 style="overflow:visible; display:block; min-height:180px;">
+                <path class="wire" d="${wirePath}"/>
+                ${loopsHTML}
+                ${this._buildBulbsHTML(hooks, attachX, wireY, 0, 22, 75)}
+            </svg>`;
+        },
+
+        _renderBulbsTablet(container, hooks) {
+            const chunkSize = 4;
+            const chunks = [];
+            for (let i = 0; i < hooks.length; i += chunkSize) {
+                chunks.push({ hooks: hooks.slice(i, i + chunkSize), startIdx: i });
+            }
+
+            // Wide viewBox with generous spacing; fixed height keeps bulb size stable
+            const viewW    = 800;
+            const padY     = 22;
+            const viewH    = 200 + padY * 2;
+            const wireY    = 38 + padY;
+            const sagBulbs = 26;
+            const sagEdge  = 14;
+            const spacing  = 190;
+            const bW = 22, bH = 75;
+            const svgPxH   = viewH;
+
+            const rows = chunks.map(({ hooks: rowHooks, startIdx }) => {
+                const n = rowHooks.length;
+                const totalSpan = (n - 1) * spacing;
+                const startX = Math.round((viewW - totalSpan) / 2);
+                const attachX = rowHooks.map((_, i) => startX + i * spacing);
+
+                let wirePath = `M 0 ${wireY + 3}`;
+                wirePath += ` Q ${attachX[0] / 2} ${wireY + sagEdge} ${attachX[0]} ${wireY}`;
+                for (let i = 0; i < n - 1; i++) {
+                    const mid = (attachX[i] + attachX[i+1]) / 2;
+                    wirePath += ` Q ${mid} ${wireY + sagBulbs} ${attachX[i+1]} ${wireY}`;
+                }
+                wirePath += ` Q ${(attachX[n-1] + viewW) / 2} ${wireY + sagEdge} ${viewW} ${wireY + 3}`;
+
+                const loopsHTML = attachX.map(x => {
+                    const r = 5.2;
+                    return `
+                      <circle class="wire-loop" cx="${x}" cy="${wireY - r + 1}" r="${r}"/>
+                      <circle fill="#162030" stroke="#2a3a52" stroke-width="1" cx="${x}" cy="${wireY + 1}" r="2.8"/>`;
+                }).join('');
+
+                return `<svg height="${svgPxH}" viewBox="0 0 ${viewW} ${viewH}"
+                             preserveAspectRatio="xMidYMid meet"
+                             style="overflow:visible; display:block; width:100%; margin-bottom:-8px;">
+                    <path class="wire" d="${wirePath}"/>
+                    ${loopsHTML}
+                    ${this._buildBulbsHTML(rowHooks, attachX, wireY, startIdx, bW, bH)}
+                </svg>`;
+            });
+
+            container.style.overflowX = '';
+            container.innerHTML = rows.join('');
+        },
+
+        _renderBulbsMobile(container, hooks) {
+            const chunkSize = 3;
+            const chunks = [];
+            for (let i = 0; i < hooks.length; i += chunkSize) {
+                chunks.push({ hooks: hooks.slice(i, i + chunkSize), startIdx: i });
+            }
+
+            // Wide viewBox with generous spacing so labels never overlap.
+            // SVG renders at a fixed CSS pixel height (not 100% width) so
+            // bulb physical size stays consistent regardless of screen width.
+            const viewW    = 600;
+            const padY     = 22;
+            const viewH    = 200 + padY * 2;
+            const wireY    = 38 + padY;
+            const sagBulbs = 26;
+            const sagEdge  = 14;
+            const spacing  = 190;
+            const bW = 22, bH = 75;
+            // Fixed pixel height keeps bulbs the same physical size on all phones
+            const svgPxH   = viewH;   // 1 SVG unit ≈ 1 CSS px at this height
+
+            const rows = chunks.map(({ hooks: rowHooks, startIdx }) => {
+                const n = rowHooks.length;
+                const totalSpan = (n - 1) * spacing;
+                const startX = Math.round((viewW - totalSpan) / 2);
+                const attachX = rowHooks.map((_, i) => startX + i * spacing);
+
+                let wirePath = `M 0 ${wireY + 3}`;
+                wirePath += ` Q ${attachX[0] / 2} ${wireY + sagEdge} ${attachX[0]} ${wireY}`;
+                for (let i = 0; i < n - 1; i++) {
+                    const mid = (attachX[i] + attachX[i+1]) / 2;
+                    wirePath += ` Q ${mid} ${wireY + sagBulbs} ${attachX[i+1]} ${wireY}`;
+                }
+                wirePath += ` Q ${(attachX[n-1] + viewW) / 2} ${wireY + sagEdge} ${viewW} ${wireY + 3}`;
+
+                const loopsHTML = attachX.map(x => {
+                    const r = 5.2;
+                    return `
+                      <circle class="wire-loop" cx="${x}" cy="${wireY - r + 1}" r="${r}"/>
+                      <circle fill="#162030" stroke="#2a3a52" stroke-width="1" cx="${x}" cy="${wireY + 1}" r="2.8"/>`;
+                }).join('');
+
+                return `<svg height="${svgPxH}" viewBox="0 0 ${viewW} ${viewH}"
+                             preserveAspectRatio="xMidYMid meet"
+                             style="overflow:visible; display:block; width:100%; margin-bottom:-8px;">
+                    <path class="wire" d="${wirePath}"/>
+                    ${loopsHTML}
+                    ${this._buildBulbsHTML(rowHooks, attachX, wireY, startIdx, bW, bH)}
+                </svg>`;
+            });
+
+            container.innerHTML = rows.join('');
+        },
+
+        _buildBulbsHTML(hooks, attachX, wireY, globalOffset, bW, bH) {
             let bulbsHTML = '';
             hooks.forEach((hook, i) => {
+                const globalIdx = globalOffset + i;
                 const x     = attachX[i];
                 const isLit = this.selectedHook === hook.id;
-                const delay = (i * 0.55) % 4.5;
+                const delay = (globalIdx * 0.55) % 4.5;
                 const sT = wireY + 2, sH = 14, sB = sT + sH;
-                const bTop = sB, bW = 22, bH = 75;
-                const bBot = bTop + bH, bMid = bTop + bH * 0.5;
+                const bTop = sB, bBot = bTop + bH, bMid = bTop + bH * 0.5;
                 const hCy  = bTop + bH * 0.52;
                 const hRx  = bW + 60, hRy = bH * 0.72;
 
@@ -81,7 +211,7 @@ function hooksApp() {
                 const coilTop = bMid - 20;
                 const coilBot = bMid + 20;
                 const teeth   = 8;
-                const toothW  = 8;
+                const toothW  = Math.round(bW * 0.36);
                 const segH    = (coilBot - coilTop) / teeth;
                 const ctrl    = segH * 0.18;
 
@@ -108,7 +238,7 @@ function hooksApp() {
                    style="transform-origin:${x}px ${wireY}px; animation-delay:${delay}s;"
                    onclick="selectHookById('${hook.id}')">
                     <defs>
-                        <radialGradient id="g${i}" cx="50%" cy="50%" r="50%">
+                        <radialGradient id="g${globalIdx}" cx="50%" cy="50%" r="50%">
                             <stop offset="0%"   stop-color="#fde047" stop-opacity="0.88"/>
                             <stop offset="22%"  stop-color="#fbbf24" stop-opacity="0.68"/>
                             <stop offset="48%"  stop-color="#f59e0b" stop-opacity="0.36"/>
@@ -117,7 +247,7 @@ function hooksApp() {
                             <stop offset="100%" stop-color="#000"    stop-opacity="0"/>
                         </radialGradient>
                     </defs>
-                    <ellipse class="glow-halo" cx="${x}" cy="${hCy}" rx="${hRx}" ry="${hRy}" fill="url(#g${i})"/>
+                    <ellipse class="glow-halo" cx="${x}" cy="${hCy}" rx="${hRx}" ry="${hRy}" fill="url(#g${globalIdx})"/>
                     <line class="hanger" x1="${x}" y1="${wireY+2}" x2="${x}" y2="${sT}"/>
                     <rect class="bulb-socket" x="${x-9}" y="${sT}" width="18" height="${sH}" rx="3"/>
                     <line class="socket-rib" x1="${x-9}" y1="${sT+4}"  x2="${x+9}" y2="${sT+4}"/>
@@ -136,15 +266,7 @@ function hooksApp() {
                     <text class="bulb-label" x="${x}" y="${bBot+21}">${hook.name}</text>
                 </g>`;
             });
-
-            container.innerHTML = `
-            <svg width="100%" viewBox="0 0 ${viewW} ${viewH}"
-                 preserveAspectRatio="xMidYMid meet"
-                 style="overflow:visible; display:block; min-height:180px;">
-                <path class="wire" d="${wirePath}"/>
-                ${loopsHTML}
-                ${bulbsHTML}
-            </svg>`;
+            return bulbsHTML;
         },
 
         async highlightCurrent() {
@@ -188,6 +310,14 @@ function hooksApp() {
             window.addEventListener('shiki-ready', () => {
                 if (this.selectedHookData) this.highlightCurrent();
             });
+
+            // Re-render bulbs on resize (e.g. orientation change)
+            let _resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(_resizeTimer);
+                _resizeTimer = setTimeout(() => this.renderBulbs(), 120);
+            });
+
             Alpine.store('hooksApp', this);
         }
     };

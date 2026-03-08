@@ -255,6 +255,35 @@ body {
     border-top: none;
 }
 
+/* Mobile nav dropdown button */
+.mobile-nav-btn {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--text-mid);
+    background: none;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    transition: color 0.2s;
+    text-align: left;
+    padding: 0.6rem 0;
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid var(--border);
+}
+.mobile-nav-btn:last-child { border-bottom: none; }
+.mobile-nav-btn:hover      { color: var(--text); }
+.mobile-nav-btn.active     { color: var(--amber); }
+
+/* Mobile nav dropdown container */
+.mobile-nav-dropdown {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
 /* ──────────────────────────────────────────
    MAIN LAYOUT
 ────────────────────────────────────────── */
@@ -263,7 +292,7 @@ body {
     margin: 0 auto;
     padding: 2rem 1.75rem;
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 /* ──────────────────────────────────────────
@@ -506,6 +535,8 @@ body {
 /* ──────────────────────────────────────────
    RESPONSIVE
 ────────────────────────────────────────── */
+
+/* Hamburger / mobile nav chrome — tablets included */
 @media (max-width: 767px) {
     .desk-nav  { display: none !important; }
     .hamburger { display: flex !important; }
@@ -513,6 +544,44 @@ body {
 }
 @media (min-width: 768px) {
     .mobile-nav { display: none !important; }
+}
+
+/* Phone-only: smaller title, multi-row bulbs, modal overlay */
+@media (max-width: 519px) {
+    .hook-fn-name {
+        font-size: 1.05rem;
+    }
+
+    .hook-card-wrap {
+        position: fixed;
+        top: 66px; /* below sticky header */
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        overflow-y: auto;
+        background: rgba(7, 9, 15, 0.98);
+        padding: 1rem 1.1rem 2rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .hook-card-wrap .hook-card {
+        margin-top: 0.25rem;
+    }
+}
+
+/* Tablet and above: reset hook-card-wrap to normal flow */
+@media (min-width: 520px) {
+    .hook-card-wrap {
+        position: static;
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        z-index: auto;
+        overflow-y: visible;
+        background: none;
+        padding: 0;
+    }
 }
 
 /* Custom scrollbar */

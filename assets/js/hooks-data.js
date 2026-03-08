@@ -5,7 +5,7 @@
 
 /* global window */
 window.HOOKS_DATA = [
-    { id: 'field', label: 'Field Hooks', hooks: [
+    { id: 'field', label: 'Field', hooks: [
         { id: 'formatStateUsing', name: 'formatStateUsing',
           description: 'formatStateUsing() (alias of afterStateHydrated()) — Formats the field value for display only — does not affect the saved value. Runs after the field is filled with data from the database or array.',
           when: 'Use to format how the value is displayed immediately after it\'s loaded into the field without changing the actual saved value.',
@@ -25,7 +25,7 @@ window.HOOKS_DATA = [
           when: 'Use when you have conditional fields that should still be saved even when hidden.',
           example: `TextInput::make('admin_notes')\n    ->hidden(fn (Get $get) =>\n        $get('role') !== 'admin'\n    )\n    ->dehydratedWhenHidden()` }
     ]},
-    { id: 'create', label: 'Create Page Hooks', hooks: [
+    { id: 'create', label: 'Create Page', hooks: [
         { id: 'beforeFill', name: 'beforeFill',
           description: 'Runs before the form is populated with default values.',
           when: 'Use to pre-populate fields from context before the form loads — e.g. from a query parameter, session value, or a related parent record passed in the URL.',
@@ -55,7 +55,7 @@ window.HOOKS_DATA = [
           when: 'Use to automatically add data like user_id, timestamps, or calculated fields.',
           example: `protected function mutateFormDataBeforeCreate(array $data): array\n{\n    $data['user_id'] = auth()->id();\n    $data['published_at'] = now();\n    return $data;\n}` }
     ]},
-    { id: 'edit', label: 'Edit Page Hooks', hooks: [
+    { id: 'edit', label: 'Edit Page', hooks: [
         { id: 'beforeFillEdit', name: 'beforeFill',
           description: 'Runs before the form is populated from the database.',
           when: 'Use to check a business rule about the record before it loads — e.g. redirect if the record is in a state that should not be edited.',
@@ -93,7 +93,7 @@ window.HOOKS_DATA = [
           when: 'Use to clear cache, send notifications, or trigger events after update.',
           example: `protected function afterSave(): void\n{\n    Cache::forget("post-{$this->record->id}");\n    event(new PostUpdated($this->record));\n}` }
     ]},
-    { id: 'view', label: 'View Page Hooks', hooks: [
+    { id: 'view', label: 'View Page', hooks: [
         { id: 'beforeFillView', name: 'beforeFill',
           description: 'Runs before the disabled form fields are populated from the database. Not run on pages using an infolist.',
           when: 'Use to perform setup or run additional logic before the record data is loaded into the form.',
@@ -103,7 +103,7 @@ window.HOOKS_DATA = [
           when: 'Use to log view activity or transform data after the form is populated.',
           example: `protected function afterFill(): void\n{\n    activity()\n        ->performedOn($this->record)\n        ->log('viewed record');\n}` }
     ]},
-    { id: 'actions', label: 'Action Hooks', hooks: [
+    { id: 'actions', label: 'Action', hooks: [
         { id: 'beforeFormFilled', name: 'beforeFormFilled',
           description: 'Runs before the action modal form is populated.',
           when: 'Use to prepare or modify default data before the modal form is shown.',
@@ -159,7 +159,7 @@ window.HOOKS_DATA = [
           worksOn: 'CreateAction, EditAction',
           example: `EditAction::make()\n    ->using(function (Model $record, array $data): Model {\n        $record->update($data);\n        return $record;\n    })` }
     ]},
-    { id: 'wizard', label: 'Schema Hooks', hooks: [
+    { id: 'wizard', label: 'Schema', hooks: [
         { id: 'stepBeforeValidation', name: 'beforeValidation',
           description: 'Runs before validation occurs on the wizard step.',
           when: 'Use to prepare or inject data before the step\'s fields are validated.',
@@ -169,7 +169,7 @@ window.HOOKS_DATA = [
           when: 'Use to run logic after the step passes validation — e.g. persisting partial data or triggering side effects between steps.',
           example: `use Filament\\Schemas\\Components\\Wizard\\Step;\n\nStep::make('Order')\n    ->afterValidation(function () {\n        // Persist partial data or trigger\n        // events after this step is validated\n    })\n    ->schema([\n        // ...\n    ])` }
     ]},
-    { id: 'table', label: 'Table Column Hooks', hooks: [
+    { id: 'table', label: 'Table Column', hooks: [
         { id: 'beforeStateUpdatedColumn', name: 'beforeStateUpdated',
           description: 'Runs before an editable column value (text input, select, toggle, checkbox) is saved.',
           when: 'Use to validate or prevent updates to editable table columns.',
