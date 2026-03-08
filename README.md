@@ -1,3 +1,5 @@
-# Filament PHP Hooks — Interactive Visual Reference
+# Filament PHP Lifecycle Hooks
 
-An interactive guide to all Filament PHP v5 lifecycle hooks.
+<img src="https://raw.githubusercontent.com/andreia/filament-hooks/main/assets/images/light-bulb.png" width="100%" alt="Hooks Light Bulb Navigation">
+
+An interactive visual reference to all Filament PHP v5 lifecycle hooks.
